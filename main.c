@@ -153,9 +153,10 @@ int main(void)
 			  dac_stopdigit=dac_stopvoltage*4096/3.3;
 			  uint16_t step=100;
 			  step_interval=(dac_stopdigit-dac_startdigit)/step;
-			  gpio_enable=2;
+			  gpio_enable=2;//ここでフラグを立てて、別の処理に移ることでdac_startdigitやdac_stopdigitなどの値が保持されるので、rx_bufを自由にクリアすることが可能になる。
 
 		  }
+
 
 		  else if(gpio_enable==2){
 			  HAL_DAC_Start(&hdac,DAC_CHANNEL_1);
@@ -163,7 +164,9 @@ int main(void)
 				  HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1, DAC_ALIGN_12B_R, i-1);
 				  HAL_Delay(100);
 			  }
-		  }
+
+			  /*これでDACからの出力がスイープされることになる。ただforではあくまで1回のスイープだけでwhile文で連続したスイープを実現している。
+     			そのため、HAL_Delay(100);の文だけディレイが生じる。改善の余地あり。*/
 
 		  else if(gpio_enable==0){
 			  HAL_DAC_Start(&hdac,DAC_CHANNEL_1);
